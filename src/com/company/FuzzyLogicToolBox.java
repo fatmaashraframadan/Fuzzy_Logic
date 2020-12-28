@@ -1,8 +1,10 @@
 package com.company;
 
 import java.lang.reflect.Array;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class FuzzyLogicToolBox {
@@ -37,34 +39,65 @@ public class FuzzyLogicToolBox {
                 for(FuzzySet s : v1.getFuzzySet()){
                     if(s.getName().equals(R.LinguisticValues.get(i))) {
                         val1 = s.getMemberShip();
+                        break;
                     }
                 }
                 result.add(val1);
             }
             int x=0;
-            Double temp=0.0;
-            for(int y=0; y<R.controlRule.size() && x<result.size(); y++){
-                if(R.controlRule.get(y).equals("not")){
-                    temp = 1-result.get(x++);
-                }
-                else if(R.controlRule.get(y).equals("and")){
+            double temp=0.0;
+            for(int y=0; y<R.controlRule.size() && x<result.size()-1; y++){
+                if ("not".equals(R.controlRule.get(y))) {
+                    temp = 1 - result.get(x++);
+                } else if ("and".equals(R.controlRule.get(y)) && x<=result.size()-2) {
                     temp = Math.min(result.get(x++), result.get(x++));
-                }
-                else if(R.controlRule.get(y).equals("or")){
+
+                } else if ("or".equals(R.controlRule.get(y))&& x<=result.size()-2) {
                     temp = Math.max(result.get(x++), result.get(x++));
                 }
             }
-            ruleInference.add(temp);
+            Variables v = getByName(R.LinguisticVariables.get(R.LinguisticVariables.size()-1));
+            for(FuzzySet s: v.getFuzzySet()){
+                if(s.getName().equals(R.LinguisticValues.get(R.LinguisticValues.size()-1))){
+                    s.setMemberShip(temp);
+                    break;
+                }
+            }
         }
-        System.out.println("Rules inference values : ");
-        for(int u=0; u<ruleInference.size(); u++){
-            System.out.println("R"+ u+1 + ": " + ruleInference.get(u));
-        }
+        System.out.println("    Rules inference values : ");
+        Variables v = fuzzyVariables.get(fuzzyVariables.size()-1);
+        System.out.println(v.getName() + " memberships:");
+        v.printMembership();
     }
 
 
     void defuzzification(){
+        HashMap<FuzzySet, Double> centroids = new HashMap<>();
+        Variables cost = fuzzyVariables.get(fuzzyVariables.size()-1);
+        FuzzySet maximum = cost.fuzzySet.get(0);
+        System.out.println(maximum.getName() + maximum.getMemberShip());
+        for(FuzzySet s: cost.getFuzzySet()){
+            if(s.memberShip > maximum.memberShip) maximum = s;
+            centroids.put(s,calcCentroid(s));
+        }
+        System.out.println("Predicted Value: " + equation(centroids));
+        System.out.println(cost.getName() + " will be "+ maximum.getName());
+    }
 
+    Double equation(HashMap<FuzzySet, Double> centroids){
+        Double sum=0.0, Denomi=0.0;
+        for (HashMap.Entry<FuzzySet, Double> me : centroids.entrySet()) {
+            sum += me.getValue() * me.getKey().memberShip;
+            Denomi += me.getKey().memberShip;
+        }
+        return sum/Denomi;
+    }
+    Double calcCentroid(FuzzySet set){
+        Double sum=0.0;
+        for(point p: set.getSetDimension()){
+            sum += p.getX();
+        }
+        return sum/set.getSetDimension().size();
     }
 
     //input number of variables with crisp values and their values
@@ -83,7 +116,7 @@ public class FuzzyLogicToolBox {
         }
         fuzzification();
         inference();
-        //defuzzification();
+        defuzzification();
     }
 
     Variables getByName(String name){
@@ -106,7 +139,7 @@ public class FuzzyLogicToolBox {
         for(int i=0; i<splitted.length; i++){
             // if variable
             // then variable
-            if(splitted[i].equals("if") || splitted[i].equals("then")){
+            if(splitted[i].equals("if") || splitted[i].equals("If") || splitted[i].equals("then")){
                 ruleVariables.add(splitted[i+1]);
                 i++;
             }

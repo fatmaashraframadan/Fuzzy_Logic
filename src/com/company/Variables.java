@@ -57,6 +57,14 @@ public class Variables {
         }
     }
 
+    FuzzySet getByName(String name){
+        for(FuzzySet v: fuzzySet){
+            if(v.getName().equals(name))
+                return v;
+        }
+        return null;
+    }
+
     public Double getCrispValue() {
         return CrispValue;
     }
