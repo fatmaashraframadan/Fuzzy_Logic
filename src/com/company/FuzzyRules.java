@@ -6,7 +6,6 @@ public class FuzzyRules {
     ArrayList<String> LinguisticVariables;
     ArrayList<String> LinguisticValues;
     ArrayList<String> controlRule;
-
     //For rules with Linguistic Vars, Vals, and Control
     FuzzyRules(ArrayList<String> Variables, ArrayList<String> Values, ArrayList<String> control){
         LinguisticVariables = new ArrayList<>();

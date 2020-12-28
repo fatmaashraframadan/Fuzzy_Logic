@@ -14,6 +14,7 @@ public class FuzzyLogicToolBox {
         fuzzyVariables = new ArrayList<>();
         fuzzyRules = new ArrayList<>();
     }
+
     void fuzzification(){
         for(Variables v: fuzzyVariables){
             if(v.getCrispValue() != null){
@@ -25,6 +26,7 @@ public class FuzzyLogicToolBox {
             v.printMembership();
         }
     }
+
     void inference(){
         ruleInference = new ArrayList<>();
         for(FuzzyRules R: fuzzyRules){
@@ -42,14 +44,14 @@ public class FuzzyLogicToolBox {
             int x=0;
             Double temp=0.0;
             for(int y=0; y<R.controlRule.size() && x<result.size(); y++){
-                if(R.controlRule.get(y).equals("or")){
-                    temp = Math.max(result.get(x++), result.get(x++));
+                if(R.controlRule.get(y).equals("not")){
+                    temp = 1-result.get(x++);
                 }
                 else if(R.controlRule.get(y).equals("and")){
                     temp = Math.min(result.get(x++), result.get(x++));
                 }
-                else if(R.controlRule.get(y).equals("not")){
-                    temp = Math.min(result.get(x++), result.get(x++));
+                else if(R.controlRule.get(y).equals("or")){
+                    temp = Math.max(result.get(x++), result.get(x++));
                 }
             }
             ruleInference.add(temp);
@@ -81,7 +83,7 @@ public class FuzzyLogicToolBox {
         }
         fuzzification();
         inference();
-        defuzzification();
+        //defuzzification();
     }
 
     Variables getByName(String name){
@@ -102,15 +104,24 @@ public class FuzzyLogicToolBox {
         String splitted[] = Rule.split(" ");
 
         for(int i=0; i<splitted.length; i++){
-            // if variable then variable
+            // if variable
+            // then variable
             if(splitted[i].equals("if") || splitted[i].equals("then")){
                 ruleVariables.add(splitted[i+1]);
                 i++;
             }
             // variable is value
+            // variable is not value
             else if (splitted[i].equals("is")){
                 if(splitted[i+1].contains(".")) splitted[i+1] = splitted[i+1].substring(0,splitted[i+1].length()-1);
-                ruleValues.add(splitted[i+1]);
+                if(splitted[i+1].equals("not")){
+                    controlRule.add(splitted[i+1]);
+                    ruleValues.add(splitted[i+2]);
+                    i++;
+                }
+                else {
+                    ruleValues.add(splitted[i + 1]);
+                }
                 i++;
             }
             //or/and variable
