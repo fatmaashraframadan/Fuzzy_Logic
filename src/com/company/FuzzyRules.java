@@ -1,13 +1,15 @@
 package com.company;
 
+import javafx.util.Pair;
+
 import java.util.ArrayList;
 
 public class FuzzyRules {
     ArrayList<String> LinguisticVariables;
-    ArrayList<String> LinguisticValues;
+    ArrayList<Pair<String,Boolean>> LinguisticValues;
     ArrayList<String> controlRule;
     //For rules with Linguistic Vars, Vals, and Control
-    FuzzyRules(ArrayList<String> Variables, ArrayList<String> Values, ArrayList<String> control){
+    FuzzyRules(ArrayList<String> Variables,ArrayList<Pair<String,Boolean>> Values, ArrayList<String> control){
         LinguisticVariables = new ArrayList<>();
         LinguisticVariables.addAll(Variables);
 
@@ -19,7 +21,7 @@ public class FuzzyRules {
     }
 
     //For rules with Linguistic Vars, Vals (one variable only)
-    FuzzyRules(ArrayList<String> Variables, ArrayList<String> Values){
+    FuzzyRules(ArrayList<String> Variables, ArrayList<Pair<String,Boolean>> Values){
         LinguisticVariables = new ArrayList<>();
         LinguisticVariables.addAll(Variables);
 
@@ -35,10 +37,10 @@ public class FuzzyRules {
         LinguisticVariables = linguisticVariables;
     }
 
-    public ArrayList<String> getLinguisticValues() {
+    public ArrayList<Pair<String,Boolean>> getLinguisticValues() {
         return LinguisticValues;
     }
-    public void setLinguisticValues(ArrayList<String> linguisticValues) {
+    public void setLinguisticValues(ArrayList<Pair<String,Boolean>> linguisticValues) {
         LinguisticValues = linguisticValues;
     }
 

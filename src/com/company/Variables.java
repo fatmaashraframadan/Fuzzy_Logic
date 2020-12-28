@@ -44,8 +44,6 @@ public class Variables {
         return (a.y - b.y)/(a.x - b.x);
     }
     Double lineEqu(Double m, point p){
-        // y = mx + c (get c)
-        // get y
         Double c = p.getY() - (p.getX()*m);
         Double y = (m*CrispValue) + c;
         return y;

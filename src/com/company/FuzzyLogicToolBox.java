@@ -1,5 +1,7 @@
 package com.company;
 
+import javafx.util.Pair;
+
 import java.lang.reflect.Array;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
@@ -26,19 +28,22 @@ public class FuzzyLogicToolBox {
         for(Variables v : fuzzyVariables){
             System.out.println(v.getName() + " memberships:");
             v.printMembership();
+            System.out.println("\n");
         }
     }
 
     void inference(){
         ruleInference = new ArrayList<>();
+        int it = 1;
         for(FuzzyRules R: fuzzyRules){
             ArrayList<Double> result = new ArrayList<>();
             for(int i=0; i<R.LinguisticVariables.size()-1; i++){
                 Double val1=0.0;
                 Variables v1 = getByName(R.LinguisticVariables.get(i));
                 for(FuzzySet s : v1.getFuzzySet()){
-                    if(s.getName().equals(R.LinguisticValues.get(i))) {
-                        val1 = s.getMemberShip();
+                    if(s.getName().equals(R.LinguisticValues.get(i).getKey())) {
+                        if(R.LinguisticValues.get(i).getValue()==true) val1 = 1.0-s.getMemberShip();
+                        else  val1 = s.getMemberShip();
                         break;
                     }
                 }
@@ -46,25 +51,29 @@ public class FuzzyLogicToolBox {
             }
             int x=0;
             double temp=0.0;
-            for(int y=0; y<R.controlRule.size() && x<result.size()-1; y++){
-                if ("not".equals(R.controlRule.get(y))) {
-                    temp = 1 - result.get(x++);
-                } else if ("and".equals(R.controlRule.get(y)) && x<=result.size()-2) {
-                    temp = Math.min(result.get(x++), result.get(x++));
-
-                } else if ("or".equals(R.controlRule.get(y))&& x<=result.size()-2) {
-                    temp = Math.max(result.get(x++), result.get(x++));
+            if(R.controlRule!=null) {
+                for (int y = 0; y < R.controlRule.size(); y++) {
+                    if ("and".equals(R.controlRule.get(y))) {
+                        temp = Math.min(result.get(x++), result.get(x));
+                        result.set(x, temp);
+                    } else if ("or".equals(R.controlRule.get(y))) {
+                        temp = Math.max(result.get(x++), result.get(x));
+                        result.set(x, temp);
+                    }
                 }
             }
             Variables v = getByName(R.LinguisticVariables.get(R.LinguisticVariables.size()-1));
             for(FuzzySet s: v.getFuzzySet()){
-                if(s.getName().equals(R.LinguisticValues.get(R.LinguisticValues.size()-1))){
-                    s.setMemberShip(temp);
+                if(s.getName().equals(R.LinguisticValues.get(R.LinguisticValues.size()-1).getKey())){
+                    if(s.getMemberShip()==null)s.setMemberShip(temp);
+                    else s.setMemberShip(Math.max(s.getMemberShip(),temp));
                     break;
                 }
             }
+
+            System.out.println("Rule " + (it++) + " : " + temp);
         }
-        System.out.println("    Rules inference values : ");
+        System.out.println("\nRules inference values : ");
         Variables v = fuzzyVariables.get(fuzzyVariables.size()-1);
         System.out.println(v.getName() + " memberships:");
         v.printMembership();
@@ -75,12 +84,12 @@ public class FuzzyLogicToolBox {
         HashMap<FuzzySet, Double> centroids = new HashMap<>();
         Variables cost = fuzzyVariables.get(fuzzyVariables.size()-1);
         FuzzySet maximum = cost.fuzzySet.get(0);
-        System.out.println(maximum.getName() + maximum.getMemberShip());
+      //  System.out.println(maximum.getName() + maximum.getMemberShip());
         for(FuzzySet s: cost.getFuzzySet()){
             if(s.memberShip > maximum.memberShip) maximum = s;
             centroids.put(s,calcCentroid(s));
         }
-        System.out.println("Predicted Value: " + equation(centroids));
+        System.out.println("\nPredicted Value: " + equation(centroids));
         System.out.println(cost.getName() + " will be "+ maximum.getName());
     }
 
@@ -131,7 +140,8 @@ public class FuzzyLogicToolBox {
     }
     public void addRule(String Rule){
         ArrayList<String> ruleVariables = new ArrayList<>();
-        ArrayList<String> ruleValues = new ArrayList<>();
+       // values = new Pair<String,Boolean>();
+        ArrayList<Pair<String,Boolean>> ruleValues = new ArrayList<>();
         ArrayList<String> controlRule = new ArrayList<>();
         FuzzyRules rule;
         String splitted[] = Rule.split(" ");
@@ -148,12 +158,13 @@ public class FuzzyLogicToolBox {
             else if (splitted[i].equals("is")){
                 if(splitted[i+1].contains(".")) splitted[i+1] = splitted[i+1].substring(0,splitted[i+1].length()-1);
                 if(splitted[i+1].equals("not")){
-                    controlRule.add(splitted[i+1]);
-                    ruleValues.add(splitted[i+2]);
+                   // controlRule.add(splitted[i+1]);
+                    ruleValues.add(new Pair(splitted[i+2],true));
                     i++;
                 }
                 else {
-                    ruleValues.add(splitted[i + 1]);
+                    ruleValues.add(new Pair(splitted[i+1],false));
+                   // ruleValues.add(splitted[i + 1]);
                 }
                 i++;
             }
