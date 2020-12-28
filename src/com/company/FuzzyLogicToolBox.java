@@ -20,6 +20,7 @@ public class FuzzyLogicToolBox {
     }
 
     void fuzzification(){
+        System.out.println("1.Fuzzification Result : ");
         for(Variables v: fuzzyVariables){
             if(v.getCrispValue() != null){
                 v.calculateMembership();
@@ -33,6 +34,7 @@ public class FuzzyLogicToolBox {
     }
 
     void inference(){
+        System.out.println("2.Inference Result : ");
         ruleInference = new ArrayList<>();
         int it = 1;
         for(FuzzyRules R: fuzzyRules){
@@ -81,10 +83,11 @@ public class FuzzyLogicToolBox {
 
 
     void defuzzification(){
+        System.out.println("3.De-Fuzzification Result : ");
         HashMap<FuzzySet, Double> centroids = new HashMap<>();
         Variables cost = fuzzyVariables.get(fuzzyVariables.size()-1);
         FuzzySet maximum = cost.fuzzySet.get(0);
-      //  System.out.println(maximum.getName() + maximum.getMemberShip());
+
         for(FuzzySet s: cost.getFuzzySet()){
             if(s.memberShip > maximum.memberShip) maximum = s;
             centroids.put(s,calcCentroid(s));

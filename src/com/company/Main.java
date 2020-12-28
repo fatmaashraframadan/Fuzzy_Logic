@@ -84,5 +84,7 @@ public class Main {
         fuzzyLogicToolBox.addRule("If Project_Funding is L and Team_Experience_Level is Beginner then Risk is H");
 
         fuzzyLogicToolBox.inputData();
+
+
     }
 }
