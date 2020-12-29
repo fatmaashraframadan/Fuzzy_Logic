@@ -8,7 +8,8 @@ public class Main {
 
     public static void main(String[] args) {
         // write your code here
-       // FuzzyLogicToolBox fuzzyLogicToolBox = new FuzzyLogicToolBox();
+//         FuzzyLogicToolBox fuzzyLogicToolBox = new FuzzyLogicToolBox();
+//
 //        Variables project = new Variables("dirt");
 //        ArrayList<Double> set = new ArrayList<>(Arrays.asList(0.0, 0.0, 20.0, 40.0));
 //        project.addFuzzySet("small", set);
@@ -47,6 +48,7 @@ public class Main {
 //        fuzzyLogicToolBox.addRule("If dirt is large and fabric is not soft then time is very_long.");
 //        fuzzyLogicToolBox.addRule("If dirt is large and fabric is soft then time is standard.");
 
+        
         FuzzyLogicToolBox fuzzyLogicToolBox = new FuzzyLogicToolBox();
 
         Variables project = new Variables("Project_Funding");
